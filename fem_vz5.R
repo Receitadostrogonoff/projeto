@@ -14,9 +14,11 @@
 
 # versão 5 - 31/10/23
 #1 - criação de uma nova tabela para os mapas (mapa 1 e mapa 2) será usadoo dado consumado e o tentado
-#2 - limpeza da tabela 
-#
-
+#2 - limpeza da tabela para os mapas
+#3 - exclusão da tabela de dispersão ( devidoaa série temporal)
+#4 - definição do ggplot como criador fundamental dos gráficos que serão realizados 
+#5 - preparaçao para o início da versao 6 (versão final)
+#6 - definição de 3 tipos (total, tentado e consumado) de metodos de observações.
 
 
 #cor que sera utilizada na estetica - #FF61c9 - Rosa
