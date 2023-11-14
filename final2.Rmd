@@ -1,0 +1,469 @@
+---
+title: "código final segunda versão"
+author: "Macaio, Yasmin"
+date: "2023-11-14"
+output:
+   rmdformats::downcute:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## puxar a bliblioteca
+```{r}
+
+library(readxl)
+vs2fem <- read_excel("C:/Users/14086606798/Downloads/vs2fem.xlsx")
+
+View(vs2fem)
+```
+
+## traduzir
+```{r}
+vs2fem$tentado_consumado <- iconv(vs2fem$tentado_consumado, "latin1", "UTF-8")
+vs2fem$data_fato <- format(as.Date(vs2fem$data_fato, format="%d/%m/%Y"),"%m")
+
+```
+
+
+## criaçao da primeira tabela de dados personalizada por grafico
+```{r}
+
+#group by
+
+library(dplyr)
+
+#para cidades - pode ser usado para os mapas entretanto nao esta separando o tentado para o consumado
+
+df_grupado = vs2fem %>% group_by(municipio_ibge, cidades, qtde_vitimas) %>%
+  summarise(total_vitimas = sum(qtde_vitimas),
+            .groups = 'drop')
+
+```
+
+## diferenciar tentado pra consumado
+```{r}
+
+#diferenciar tentado pra consumado
+
+names(vs2fem)
+
+#tentado
+vs2fem_tentado = vs2fem %>% filter(tentado_consumado=="tentado")
+
+#consumado
+vs2fem_consumado = vs2fem %>% filter(tentado_consumado=="consumado")
+
+
+
+#### observaçoes o mes precisa ser numerico em diversas montagens de graficos
+```
+
+## grafico de linha - ggplot 
+```{r}
+# grafico de linha - ggplot 
+
+#tabelas 
+
+vs2fem_linha_1 = vs2fem %>% group_by(tipo_regiao, qtde_vitimas, data_fato) %>%
+  summarise(total_vitimas = sum(qtde_vitimas),
+            .groups = 'drop')
+
+View(vs2fem_linha_1)
+
+vs2fem_linha_2 = vs2fem %>% filter(tentado_consumado=="tentado") %>% group_by(tipo_regiao, qtde_vitimas, data_fato) %>%
+  summarise(vitimas_tentadas = sum(qtde_vitimas),
+            .groups = 'drop')
+
+View(vs2fem_linha_2)
+
+
+vs2fem_linha_3 = vs2fem %>% filter(tentado_consumado=="consumado") %>% group_by(tipo_regiao, qtde_vitimas, data_fato) %>%
+  summarise(vitimas_consumadas = sum(qtde_vitimas),
+            .groups = 'drop')
+
+View(vs2fem_linha_3)
+```
+
+## grafico de linha 
+```{r}
+
+library(ggplot2)
+
+#total 
+
+ggplot(vs2fem_linha_1, aes(x=data_fato, y=total_vitimas, group = tipo_regiao)) + 
+  geom_line(aes(color=tipo_regiao)) +
+  scale_color_manual(name='Regiões de MG', labels=c('belo horizonte','interior de minas','regiao metropolitana'),
+                     values=c('blue', '#d7008d', 'green')) +labs(title = "Ocorrências de feminicidio no estado de MG",
+                                                                      x = "Meses ", y = "Número de vitimas ",caption = "Fonte dos dados: Sistema de Informação de Agravos de Notificação (Sinan)")+
+  guides(fill=guide_legend(title="Regiões de MG")) +geom_point( size=2, shape=20, fill="white") +
+  theme_light()
+
+
+#tentado
+ggplot(vs2fem_linha_2, aes(x=data_fato, y=vitimas_tentadas, group = tipo_regiao)) + 
+  geom_line(aes(color=tipo_regiao)) +
+  scale_color_manual(name='Regiões de MG', labels=c('belo horizonte','interior de minas','regiao metropolitana'),
+                     values=c('blue', '#d7008d', 'green')) +labs(title = "Ocorrências de tentativas de feminicidio no estado de MG",
+                                                                      x = "Meses ", y = "Número de vitimas ",caption = "Fonte dos dados: Sistema de Informação de Agravos de Notificação (Sinan)")+
+  guides(fill=guide_legend(title="Regiões de MG")) +geom_point( size=2, shape=20, fill="white") +
+  theme_light()
+
+#consumado
+ggplot(vs2fem_linha_3, aes(x=data_fato, y=vitimas_consumadas, group = tipo_regiao)) + 
+  geom_line(aes(color=tipo_regiao)) +
+  scale_color_manual(name='Regiões de MG', labels=c('belo horizonte','interior de minas','regiao metropolitana'),
+                     values=c('blue', '#d7008d', 'green')) +labs(title = "Ocorrências de feminicidio consumado no estado de MG",
+                                                                      x = "Meses ", y = "Número de vitimas ",caption = "Fonte dos dados: Sistema de Informação de Agravos de Notificação (Sinan)")+
+  guides(fill=guide_legend(title="Regiões de MG")) +geom_point( size=2, shape=20, fill="white")+
+  theme_light()
+
+```
+
+## grafico de barra
+```{r}
+#sera usado as tabelas  que foram usadas para o grafico de linhas
+
+View(vs2fem_linha_1)
+
+library(ggplot2)
+
+#total
+ggplot(vs2fem_linha_1, aes(fill=tipo_regiao,x=data_fato, y=total_vitimas )) + 
+  geom_col(position = "dodge") +
+  theme(legend.position = "bottom")+
+  scale_fill_manual(name='Regiões de MG', labels=c('belo horizonte','interior de minas','regiao metropolitana'),
+                     values=c('#FF61c9', '#d7008d', '#9c0067')) +labs(title = "Ocorrências de feminicidio no estado de MG",
+                              x = "Meses ", y = "Número de vitimas ",caption = "Fonte dos dados: Sistema de Informação de Agravos de Notificação (Sinan)")+
+  guides(fill=guide_legend(title="Regiões de MG"))+
+  theme_light()
+
+
+#tentado
+
+library(ggplot2)
+
+ggplot(vs2fem_linha_2, aes(fill=tipo_regiao, x=data_fato, y=vitimas_tentadas )) + 
+  geom_col(position = "dodge") +
+  theme(legend.position = "bottom")+
+  scale_fill_manual(name='Regiões de MG', labels=c('belo horizonte','interior de minas','regiao metropolitana'),
+                    values=c('#FF61c9', '#d7008d', '#9c0067')) +labs(title = "Ocorrências de  tentativas de feminicidio no estado de MG",
+                                                                     x = "Meses ", y = "Número de vitimas ",caption = "Fonte dos dados: Sistema de Informação de Agravos de Notificação (Sinan)")+
+  guides(fill=guide_legend(title="Regiões de MG")) +
+  theme_light()
+
+
+#consumado
+
+ggplot(vs2fem_linha_3, aes(fill=tipo_regiao,x=data_fato, y=vitimas_consumadas )) + 
+  geom_col(position = "dodge") +
+  theme(legend.position = "bottom")+
+  scale_fill_manual(name='Regiões de MG', labels=c('belo horizonte','interior de minas','regiao metropolitana'),
+                    values=c('#FF61c9', '#d7008d', '#9c0067')) +labs(title = "Ocorrências de feminicidio consumado no estado de MG",
+                                                                     x = "Meses ", y = "Número de vitimas ",caption = "Fonte dos dados: Sistema de Informação de Agravos de Notificação (Sinan)")+
+  guides(fill=guide_legend(title="Regiões de MG")) +
+  theme_light()
+
+```
+
+
+## tabelas para o treemap e pizza
+```{r}
+#tabelas para o treemap
+
+
+vs2fem_treemap_1 = vs2fem  %>%  group_by(tipo_regiao) %>% summarise(total_vitimas=sum(qtde_vitimas))
+
+vs2fem_treemap_2 = vs2fem %>% filter(tentado_consumado=="tentado") %>%  group_by(tipo_regiao) %>% summarise(total_tentado=sum(qtde_vitimas))
+
+vs2fem_treemap_3 = vs2fem %>% filter(tentado_consumado=="consumado") %>%  group_by(tipo_regiao) %>% summarise(total_consumado=sum(qtde_vitimas))
+
+```
+
+
+## grafico de pizza 
+```{r}
+# grafico de pizza por regiao 
+
+#pie 1 - total de regiao
+#pie 2 - tentado por regiao
+#pie 3 - consumado por regiao 
+
+library(ggplot2)
+library(dplyr)
+
+#total
+
+ggplot(data = vs2fem_treemap_1, mapping = aes(x = tipo_regiao, y=..prop.., fill = tipo_regiao)) + 
+  geom_bar(width = 1) + coord_polar(theta = "x") + theme_minimal()+
+  scale_fill_manual(values = c("belo horizonte" = "#FF61c9",
+                               "interior de minas" = "#d7008d",
+                               "regiao metropolitana" = "#9c0067"))+
+  labs(title = "Ocorrências de feminicidio no estado de MG",
+       x = " ", y = " ",caption = "fonte dos dados: Sistema de Informação de Agravos de Notificação (Sinan)")+
+  guides(fill=guide_legend(title="Regiões de MG"))
+
+
+#tentado
+ggplot(data = vs2fem_treemap_2, mapping = aes(x = tipo_regiao, y=..prop.., fill = tipo_regiao)) + 
+  geom_bar(width = 1) + coord_polar(theta = "x") + theme_minimal()+
+  scale_fill_manual(values = c("belo horizonte" = "#FF61c9",
+                               "interior de minas" = "#d7008d",
+                               "regiao metropolitana" = "#9c0067"))+
+  labs(title = "Ocorrências de tentativa de feminicidio no estado de MG",
+       x = " ", y = " ",caption = "fonte dos dados: Sistema de Informação de Agravos de Notificação (Sinan)")+
+  guides(fill=guide_legend(title="Regiões de MG"))
+
+
+#consumado
+
+ggplot(data = vs2fem_treemap_3, mapping = aes(x = tipo_regiao, y=..prop.., fill = tipo_regiao)) + 
+  geom_bar(width = 1) + coord_polar(theta = "x") + theme_minimal()+
+  scale_fill_manual(values = c("belo horizonte" = "#FF61c9",
+                               "interior de minas" = "#d7008d",
+                               "regiao metropolitana" = "#9c0067"))+
+  labs(title = "Ocorrências de feminicidio consumado no estado de MG",
+       x = " ", y = " ",caption = "fonte dos dados: secretaria de seg de mg")+
+  guides(fill=guide_legend(title="Regiões de MG"))
+```
+
+## tabela personalizada para mapas
+
+```{r}
+# para mapas 
+
+#vitimas total 
+
+vs2fem_total = vs2fem %>% group_by(municipio_ibge) %>% summarise(total_de_vitimas=sum(qtde_vitimas))
+
+vs2fem_total_mapa3 = vs2fem %>% filter(tentado_consumado=="consumado") %>%  group_by(municipio_ibge) %>% summarise(total_consumado_de_vitimas=sum(qtde_vitimas))
+vs2fem_total_mapa2 = vs2fem %>% filter(tentado_consumado=="tentado") %>%  group_by(municipio_ibge) %>% summarise(total_tentado_de_vitimas=sum(qtde_vitimas))
+
+
+```
+
+## mapas
+
+```{r}
+
+# mapa - deu certo 
+
+# mapa 1 - total
+# mapa 2 - tentado 
+# mapa 3 - consumado 
+
+library(ggplot2)
+library(geobr)
+library(dplyr)
+library(RColorBrewer)
+library(sf)
+library(plotly)
+
+#para ler os municipos do MG
+
+#mapa 1 - total de vitimas
+View(vs2fem_total)
+
+desenho_municipios = read_municipality(code_muni = "MG", showProgress = FALSE)
+
+class(vs2fem_total) # para saber ac classe
+class(desenho_municipios)
+plot(desenho_municipios)
+
+class(desenho_municipios$code_muni)
+class(vs2fem_total$municipio_ibge)
+
+class(df_grupado$total_vitimas)
+
+
+vs2fem_total$municipio_ibge = as.numeric(vs2fem_total$municipio_ibge)
+
+
+fem_mg1 <-desenho_municipios %>% left_join(vs2fem_total, by = c( "code_muni"="municipio_ibge"))
+
+mapa1 = ggplot() + 
+  geom_sf(data=fem_mg1, aes(fill=total_de_vitimas)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1, name="Total de vitimas",
+                       limits = c(1,40))+
+  labs(title = "Total de ocorrências de feminicidio em MG",caption = "area cinza nao possui informação")
+
+mapa1
+
+
+
+```
+
+## mapa2
+
+```{r}
+#_________________________________
+
+
+#mapa 2 - tentado
+desenho_municipios = read_municipality(code_muni = "MG", showProgress = FALSE)
+
+class(desenho_municipios)
+plot(desenho_municipios)
+
+class(desenho_municipios$code_muni)
+class(vs2fem_total_mapa2$municipio_ibge)
+
+
+
+vs2fem_total_mapa2$municipio_ibge = as.numeric(vs2fem_total_mapa2$municipio_ibge)
+
+
+fem_mg1 <-desenho_municipios %>% left_join(vs2fem_total_mapa2, by = c( "code_muni"="municipio_ibge"))
+
+
+mapa2 = ggplot() + 
+  geom_sf(data=fem_mg1, aes(fill=total_tentado_de_vitimas)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1, name="Total de vitimas",
+                       limits = c(1,40))+
+  labs(title = "Total de ocorrências de tentativas de feminicidio em MG",caption = "area cinza não possui informação")
+
+mapa2
+
+
+
+```
+
+
+##mapa3
+```{r}
+#___________________________________________
+#mapa 3 - total de vitimas consumadas
+
+vs2fem_total = vs2fem %>% group_by(municipio_ibge) %>% summarise(total_de_vitimas=sum(qtde_vitimas))
+
+vs2fem_total_mapa3 = vs2fem %>% filter(tentado_consumado=="consumado") %>%  group_by(municipio_ibge) %>% summarise(total_consumado_de_vitimas=sum(qtde_vitimas))
+
+vs2fem_total_mapa2 = vs2fem %>% filter(tentado_consumado=="tentado") %>%  group_by(municipio_ibge) %>% summarise(total_tentado_de_vitimas=sum(qtde_vitimas))
+
+
+
+desenho_municipios = read_municipality(code_muni = "MG", showProgress = FALSE)
+
+class(desenho_municipios)
+plot(desenho_municipios)
+
+class(desenho_municipios$code_muni)
+class(vs2fem_total_mapa3$municipio_ibge)
+
+
+
+vs2fem_total_mapa3$municipio_ibge = as.numeric(vs2fem_total_mapa3$municipio_ibge)
+
+
+fem_mg1 <-desenho_municipios %>% left_join(vs2fem_total_mapa3, by = c( "code_muni"="municipio_ibge"))
+
+
+mapa3 = ggplot() + 
+  geom_sf(data=fem_mg1, aes(fill=total_consumado_de_vitimas)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1, name="Total de vitimas",
+                       limits = c(1,40))+
+  labs(title = "Total de ocorrências de feminicidio consumados em MG",caption = "area cinza não possui sem informação")
+
+mapa3
+```
+
+## treemap
+
+```{r}
+# treemap - deu certo 
+
+library(treemap)
+
+#total por regiao
+
+treemap(vs2fem_treemap_1,
+        index=c("tipo_regiao"),
+        vSize="total_vitimas",
+        fontsize.labels=c(14, 8), 
+        vColor="total_vitimas",
+        title ="Total de ocorrências de feminicidio em MG por região",
+        title.legend="Número de vitimas",
+        type="value",
+        palette = "PuRd")
+
+#tentado
+
+treemap(vs2fem_treemap_2,
+        index=c("tipo_regiao"),
+        vSize="total_tentado",
+        fontsize.labels=c(14, 8), 
+        vColor="total_tentado",
+        title ="Total de ocorrências de tentativas de feminicidio em MG por região",
+        title.legend="Número de vitimas",
+        type="value",
+        palette = "PuRd")
+
+
+#consumado
+
+treemap(vs2fem_treemap_3,
+        index=c("tipo_regiao"),
+        vSize="total_consumado",
+        fontsize.labels=c(14, 8),
+        vColor="total_consumado",
+        title ="Total de ocorrências de feminicidio consumados em MG por região",
+        title.legend="Número de vitimas",
+        type="value",
+        palette = "PuRd")
+
+#___________________________________________________________
+```
+
+
+## histograma
+
+```{r}
+#histograma 
+
+# ggplot - funcionou 
+
+library(ggplot2)
+
+#total de vitimas
+
+vs2fem_treemap_1 %>% ggplot(aes(x=tipo_regiao,y=total_vitimas,fill=tipo_regiao))+ geom_col()+
+  scale_fill_manual(values = c("belo horizonte" = "#FF61c9",
+                               "interior de minas" = "#d7008d",
+                               "regiao metropolitana" = "#9c0067")) + 
+  labs(title = "Ocorrências de tentativa de feminicidio no estado de MG",
+       x = " ", y = " ",caption = "fonte dos dados:Sistema de Informação de Agravos de Notificação (Sinan") +
+  guides(fill=guide_legend(title="Regiões de MG"))
+
+  
+  
+#tentativa
+
+vs2fem_treemap_2 %>% ggplot(aes(x=tipo_regiao,y=total_tentado,fill=tipo_regiao))+ geom_col()+
+  scale_fill_manual(values = c("belo horizonte" = "#FF61c9",
+                               "interior de minas" = "#d7008d",
+                               "regiao metropolitana" = "#9c0067")) +
+  labs(title = "Ocorrências de feminicidio no estado de MG",
+       x = " ", y = " ",caption = "fonte dos dados:Sistema de Informação de Agravos de Notificação (Sinan)") +
+  guides(fill=guide_legend(title="Regiões de MG"))
+
+
+#consumado
+
+vs2fem_treemap_3 %>% ggplot(aes(x=tipo_regiao,y=total_consumado,fill=tipo_regiao))+ geom_col()+
+  scale_fill_manual(values = c("belo horizonte" = "#FF61c9",
+                               "interior de minas" = "#d7008d",
+                               "regiao metropolitana" = "#9c0067")) +
+  labs(title = "Ocorrências de feminicidio consumado no estado de MG",
+       x = " ", y = " ",caption = "Fonte dos dados: Sistema de Informação de Agravos de Notificação (Sinan)") +
+  guides(fill=guide_legend(title="Regiões de MG"))
+
+#__________________________________________________________________________
+```
