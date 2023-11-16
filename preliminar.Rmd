@@ -1,0 +1,62 @@
+---
+title: "Análise de Dados preliminar"
+author: "Macaio, Yasmin e Teixeira, Fabio."
+date: "2023-11-16"
+output:
+   rmdformats::downcute:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
+---
+
+Nomes dos integrantes do grupo: Fábio Augusto Teixeira, Gabriel Muniz, Sophia Barboza, Thiago Gonçalves Soares, Yasmin Macaio e Valdilia de Oliveira
+
+
+# Detalhamento do método de análise.#
+
+Em nossa pesquisa estatística, optamos por utilizar o método quantitativo, focalizando o comparativo de dados provenientes do banco "Dados Abertos Gov" referentes ao estado de Minas Gerais. Esta análise abrange uma distribuição detalhada dos municípios em ordem alfabética, apresentando os casos registrados de violência contra a mulher, classificados como tentados ou consumados.
+
+# Metodologia: #
+
+Os dados foram coletados e organizados, permitindo uma segmentação dos municípios em três categorias distintas: capital, região metropolitana e interior. Esta abordagem proporciona uma análise mais refinada, fundamentada na hipótese e no pressuposto de que a capital possa apresentar números mais alarmantes em comparação ao interior.
+
+# Objetivo: #
+
+A proposta de nossa apresentação é oferecer uma visão abrangente e crítica da perspectiva mineira sobre o tema da violência contra a mulher. Além disso, buscamos instigar um diálogo construtivo, considerando que nosso grupo é composto por administradores públicos em formação e politólogos capazes de oferecer diversas interpretações.
+
+## Conteúdo da Apresentação:##
+
+# Contextualização Estatística: #
+
+Análise comparativa dos índices de violência em diferentes regiões de Minas Gerais.
+Apresentação de dados específicos para a capital, região metropolitana e interior.
+
+# Mapas Interativos: #
+
+Utilização de recursos visuais no RStudio para representar geograficamente a incidência de casos.
+Destaque para áreas de maior vulnerabilidade e necessidade de intervenção.
+
+# Informes e Análises: #
+
+Interpretação dos resultados, identificando padrões e tendências.
+Discussão sobre possíveis fatores contribuintes à disparidade entre áreas urbanas e rurais.
+
+# Perspectiva Mineira: #
+
+Abordagem de aspectos culturais e sociais que podem influenciar a dinâmica da violência contra a mulher em Minas Gerais.
+Reflexões sobre o papel dos órgãos públicos e da sociedade na promoção da segurança e igualdade de gênero.
+
+# Conclusão: #
+
+Ao encerrar nossa apresentação, buscamos não apenas oferecer uma análise estatística, mas também inspirar reflexões e ações concretas. Através do engajamento de administradores públicos em formação e politólogos, almejamos contribuir para o desenvolvimento de estratégias eficazes na prevenção e combate à violência contra a mulher em Minas Gerais.
+
+
+# informações adicionais #
+
+prévia dos nossos dados estatisticos.
+
+
+acessar em: https://rpubs.com/minmacaio/1114182
+
